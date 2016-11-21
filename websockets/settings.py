@@ -126,7 +126,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-os.path.join(os.path.dirname(ws4redis.__file__), "static"),
+        os.path.join(BASE_DIR, 'static'),
+        os.path.join(os.path.dirname(ws4redis.__file__), "static"),
 ]
 
 
