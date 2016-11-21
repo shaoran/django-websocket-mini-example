@@ -38,7 +38,6 @@ class WS(object):
 
                 redis_publisher.publish_message(RedisMessage(data))
                 ttw = random.uniform(3, 10)
-                ttw = 1
                 logger.debug(" >> [%s] websocket thread %s: %s waiting %s seconds" % (tid, datetime.now().strftime("%H:%M:%S"), data, ttw))
                 time.sleep(ttw)
         except Exception as e:
