@@ -11,7 +11,6 @@ from ws4redis.redis_store import RedisMessage
 
 from datetime import datetime
 
-print "Creating thread the listens on port 5555"
 
 class WS(object):
     def __init__(self):
