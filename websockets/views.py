@@ -16,6 +16,7 @@ import random
 from ws4redis.publisher import RedisPublisher
 from ws4redis.redis_store import RedisMessage
 
+from datetime import datetime
 
 print "Creating thread the listens on port 5555"
 
@@ -24,6 +25,8 @@ class WS(object):
         self.counter = 0
 
     def listen_and_replay_to_redis(self):
+
+        fp = open("/tmp/websocket_debug.log", "a")
 
         redis_publisher = RedisPublisher(facility='foobar', broadcast=True)
 
@@ -35,7 +38,10 @@ class WS(object):
             #data = "%s - %s" % (data, self.counter)
 
             redis_publisher.publish_message(RedisMessage(data))
-            time.sleep(random.uniform(3, 10))
+            ttw = random.uniform(3, 10)
+            fp.write("%s: %s waiting %s seconds\n" % (datetime.now().strftime("%H:%M:%S"), data, ttw))
+            fp.flush()
+            time.sleep(ttw)
 
 def old_listen_and_replay_to_redis():
     TCP_IP = '127.0.0.1'
