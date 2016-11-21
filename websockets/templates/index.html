@@ -28,6 +28,11 @@
   <body>
     <h1>Hello, world!</h1>
 
+	<input id="auto-sync" type="checkbox" style="display: none;" />
+
+	<br />
+
+
 	<b>Notifications on telnet:</b>
 	<ol id="notification">
 	</ol>
@@ -36,8 +41,61 @@
 
 		var ws_url = 'ws://' + window.location.host + '/ws/foobar?subscribe-broadcast&publish-broadcast';
 		var ws4redis;
+		var ignore_change = false;
 
 		$(function() {
+
+			$('#auto-sync').bootstrapToggle({
+				"onstyle": "success",
+				"offstyle": "default",
+				"on":      "Auto Sync enabled",
+				"off":     "Auto Sync disabled",
+				"width":   "170px"
+			}).change(function() {
+				if(ignore_change)
+				{
+					ignore_change = false;
+					return true;
+				}
+
+				var $autosync = $(this);
+				var enabled = $autosync.prop('checked');
+
+				if(enabled)
+				{
+					// trying to enable the connection
+					if(ws4redis == undefined)
+					{
+						// connection was closed by user
+						start_connection();
+						return true;
+					}
+
+					if(ws4redis.get_state() == 1) // connection is up and running
+						return true;
+
+					ignore_change = true;
+					$autosync.bootstrapToggle("off");
+					alert("Connection to the server at the moment not possible");
+					return true;
+				} else {
+					if(ws4redis == undefined) // nothing to do, connection down
+						return True;
+
+					// connection running, closing
+					if(ws4redis.get_state() == 1)
+					{
+						ws4redis.close();
+						ws4redis = undefined;
+						return true;
+					}
+
+					// connection is not running anyway
+					return true;
+				}
+
+			});
+
 			start_connection();
 		});
 
@@ -63,11 +121,14 @@
 		}
 
 		function on_connected() {
-			console.log("WS connected");
+			ignore_change = true;
+			$('#auto-sync').bootstrapToggle("on");
 		}
 
 		function on_disconnected(evt) {
-			console.log('Websocket was disconnected: ' + JSON.stringify(evt));
+			ignore_change = true;
+			auto_disconnect = true;
+			$('#auto-sync').bootstrapToggle("off");
 		}
 
 		var messages = 0;
